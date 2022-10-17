@@ -45,5 +45,21 @@ router.get('/:id', async (req, res, next) => {
     }
 });
 
+router.post('/', async (req, res, next) => {
+    try {
+        const { comp_code, amt } = req.body;
+        const result = await db.query(
+            `INSERT INTO invoices (comp_code, amt) 
+            VALUES ($1, $2)
+            RETURNING id, comp_code, amt, add_date, paid, paid_date`, [comp_code, amt]);
+        
+        return res.status(201).json({ "invoice": result.rows[0] });
+    } catch (e) {
+        next(e)
+    }
+});
+
+
+
 
 module.exports = router;
