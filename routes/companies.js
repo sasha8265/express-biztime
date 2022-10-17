@@ -49,7 +49,17 @@ router.patch('/:code', async (req, res, next) => {
     } catch (e) {
         return next(e)
     }
-})
+});
+
+router.delete('/:code', async (req, res, next) => {
+    try {
+        const { code } = req.params;
+        const results = db.query(`DELETE FROM companies WHERE code = $1`, [code])
+        return res.send({ msg: `Company Deleted: ${code}` })
+    } catch (e) {
+        return next(e)
+    }
+});
 
 
 module.exports = router;
