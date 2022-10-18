@@ -53,9 +53,12 @@ router.put('/:code', async (req, res, next) => {
 
 router.delete('/:code', async (req, res, next) => {
     try {
-        const { code } = req.params;
-        const results = db.query(`DELETE FROM companies WHERE code = $1`, [code])
-        return res.send({ msg: `Company Deleted: ${code}` })
+        const code = req.params.code;
+        const results = db.query(`DELETE FROM companies WHERE code = $1 RETURNING code`, [code])
+        if (results.rows.length === 0) {
+            throw new ExpressError(`Company code cannot be found: ${code}`, 404)
+        }
+        return res.json({ msg: `Company Deleted: ${code}` })
     } catch (e) {
         return next(e)
     }
