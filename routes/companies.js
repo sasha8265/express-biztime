@@ -1,4 +1,5 @@
 const express = require("express");
+const slugify = require("slugify")
 const ExpressError = require("../expressError")
 const router = express.Router();
 const db = require("../db");
@@ -41,9 +42,14 @@ router.get('/:code', async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
     try {
-        const { code, name, description } = req.body;
+        const { name, description } = req.body;
+        let code = slugify(name, {
+            lower: true,
+            strict: true
+        })
         const result = await db.query(
-            `INSERT INTO companies (code, name, description) VALUES ($1, $2, $3) RETURNING code, name, description`, [code, name, description]
+            `INSERT INTO companies (code, name, description) VALUES ($1, $2, $3) 
+            RETURNING code, name, description`, [code, name, description]
         );
         return res.json({company: result.rows[0]})
     } catch (e) {
@@ -68,14 +74,40 @@ router.put('/:code', async (req, res, next) => {
 router.delete('/:code', async (req, res, next) => {
     try {
         const code = req.params.code;
-        const results = db.query(`DELETE FROM companies WHERE code = $1 RETURNING code`, [code])
-        if (results.rows.length === 0) {
+        const result = await db.query(
+            `DELETE FROM companies 
+            WHERE code = $1
+            RETURNING code`, [code])
+        if (result.rows.length === 0) {
             throw new ExpressError(`Company code cannot be found: ${code}`, 404)
-        }
-        return res.json({ msg: `Company Deleted: ${code}` })
+        } else {
+            return res.json({ "status": `Company Deleted: ${code}`})
+        }  
     } catch (e) {
         return next(e)
     }
 });
+
+// router.delete("/:code", async function (req, res, next) {
+//     try {
+//         let code = req.params.code;
+
+//         const result = await db.query(
+//             `DELETE FROM companies
+//            WHERE code=$1
+//            RETURNING code`,
+//             [code]);
+
+//         if (result.rows.length == 0) {
+//             throw new ExpressError(`No such company: ${code}`, 404)
+//         } else {
+//             return res.json({ "status": "deleted" });
+//         }
+//     }
+
+//     catch (err) {
+//         return next(err);
+//     }
+// });
 
 module.exports = router;
