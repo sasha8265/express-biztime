@@ -48,6 +48,8 @@ describe("GET /companies/:code", () => {
         console.log(res.text);
         expect(res.statusCode).toBe(200);
         // expect(res.body).toEqual()
+        // do I need to define an object for testCompany1 that includes invoice data?
+        //Or do I hardcode what i expect the object to be?
     })
 
     /**
@@ -98,7 +100,7 @@ describe("PUT /companies/:code", () => {
 
 /** DELETE /companies/[code] - delete company,
  *  return `{status: "Company Deleted: [code]"}` */
-describe("DELETE /users/:id", () => {
+describe("DELETE /companies/:code", () => {
     test("Deletes a single company", async () => {
         const res = await request(app).delete(`/companies/${testCompany1.code}`);
         expect(res.statusCode).toBe(200);
