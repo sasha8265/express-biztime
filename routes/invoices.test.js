@@ -1,7 +1,6 @@
 // connect to right DB --- set before loading db.js
 process.env.NODE_ENV = "test";
 
-// npm packages - make sure we install this
 const request = require("supertest");
 
 // app imports
@@ -12,7 +11,7 @@ const db = require("../db");
 let testComp;
 let testInv;
 
-// Set up before each test - add test company data
+// Set up before each test - add test company and invoice data
 beforeEach(async () => {
     const compResult = await db.query(
         `INSERT INTO companies (code, name, description) 
@@ -46,6 +45,7 @@ describe("GET /invoices", () => {
         console.log(res.body);
         console.log({invoices: [testInv]});
         // expect(res.body).toEqual({ invoices: [testInv] })
+
         //expected: "add_date": 2022-10-19T04:00:00.000Z
         //received: "add_date": "2022-10-19T04:00:00.000Z"
     })
